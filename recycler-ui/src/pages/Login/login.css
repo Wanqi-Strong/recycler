@@ -1,0 +1,21 @@
+.welcomeTitle{
+    color: #97BF64;
+    font-weight: bold;
+    font-size: 20px;
+}
+.labelBox{
+    padding: 10px;
+    color: #97BF64;
+    line-height: 30px;
+}
+.labelBox >label{
+    width: 84px;
+    text-align: left;
+    font-weight: bold;
+    padding: 5px;
+    display: inline-block;
+}
+.btnBox{
+    text-align: center;
+    padding: 10px;
+}
