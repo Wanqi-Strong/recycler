@@ -3,11 +3,13 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import httpRequest from './js/request'
-import apiList from './js/apiList'
+import httpRequest from './js/request';
+import apiList from './js/apiList';
+import commonUtils from './js/commonUtils';
 
 React.$req = httpRequest;
 React.$api = apiList;
+React.$utils = commonUtils;
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

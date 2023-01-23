@@ -19,6 +19,7 @@ function Login(){
             let res = await React.$req.post(React.$api.userLogin,form);
             console.log(res);
             if(res.success){
+                React.$utils.setSessionStorage("userInfo",res.data.data);
                 navigateTo("/home");
             }
         }

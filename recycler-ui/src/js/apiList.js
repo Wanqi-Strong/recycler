@@ -1,5 +1,5 @@
 const apiList = {
-    userLogin:"/user/verify",
+    userLogin:"/user/login",
     userRegister:"/user/add"
 }
 export default apiList;

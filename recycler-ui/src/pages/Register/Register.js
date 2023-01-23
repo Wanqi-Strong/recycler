@@ -38,11 +38,11 @@ function Register(){
             <form onSubmit={handlerSubmit}>
                 <div className="labelBox">
                     <label htmlFor="true">Email</label>
-                    <input type="text" required id="email" ref={nameRef} />
+                    <input type="text" required id="email" ref={emailRef} />
                 </div>
                 <div className="labelBox">
                     <label htmlFor="true">Name</label>
-                    <input type="text" required id="name" ref={emailRef} />
+                    <input type="text" required id="name" ref={nameRef} />
                 </div>
                 <div className="labelBox">
                     <label htmlFor="true">Password</label>

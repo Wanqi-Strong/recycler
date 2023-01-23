@@ -1,21 +1,35 @@
 package com.recycler.service.impl;
 
+import java.util.HashSet;
 import java.util.UUID;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.recycler.base.ERole;
 import com.recycler.base.RecyclerException;
+import com.recycler.dao.RoleRepository;
 import com.recycler.dao.UserRepository;
+import com.recycler.entity.Role;
 import com.recycler.entity.User;
+import com.recycler.entity.UserDetailsImpl;
 import com.recycler.service.UserService;
 
+import jakarta.transaction.Transactional;
+
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService,UserDetailsService {
 	
 	@Autowired
 	private UserRepository userRepository;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	@Autowired
+	private RoleRepository roleRepository;
 
 	@Override
 	public User verifyUser(User user) {
@@ -24,8 +38,7 @@ public class UserServiceImpl implements UserService {
 			throw new RecyclerException("user does not exist");
 		}else {
 			// compare password
-	        BCryptPasswordEncoder bcp = new BCryptPasswordEncoder();
-			if(bcp.matches(user.getPassword(),currentUser.getPassword())) {
+			if(passwordEncoder.matches(user.getPassword(),currentUser.getPassword())) {
 				return currentUser;
 			}else {
 				throw new RecyclerException("incorrect password");
@@ -33,6 +46,7 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 
+	@Transactional
 	@Override
 	public User addUser(User user) {
 		// check if email already used
@@ -44,20 +58,25 @@ public class UserServiceImpl implements UserService {
 		// create id
 		String idString = UUID.randomUUID().toString().replaceAll("-", "");
 		user.setId(idString);
-		// create status
+		// set status
 		user.setStatus(1);
 		// encode password
-        BCryptPasswordEncoder bcp = new BCryptPasswordEncoder();
-        user.setPassword(bcp.encode(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        // set role
+        user.setRoles(new HashSet<>());
+        Role defaultRole = roleRepository.findAllByName(ERole.ROLE_USER).get(0);
+        user.getRoles().add(defaultRole);
 		userRepository.save(user);
 		return userRepository.findByEmail(email);
 	}
 
 	@Override
 	public Iterable<User> getAllUsers() {
+		System.out.println("getAllUsers");
 		return userRepository.findAll();
 	}
 
+	@Transactional
 	@Override
 	public User deleteUser(User user) {
 		User  currentUser= userRepository.findByEmail(user.getEmail());
@@ -66,8 +85,20 @@ public class UserServiceImpl implements UserService {
 		}else {
 			// update
 			currentUser.setStatus(0);
+			currentUser.getRoles().clear();
 			userRepository.save(currentUser);
 			return userRepository.findByEmail(currentUser.getEmail());
+		}
+	}
+
+	@Override
+	public UserDetails loadUserByUsername(String username) {
+		System.out.println("---loadUserByUsername---");
+		User currentUser = userRepository.findByEmail(username);
+		if(currentUser == null) {
+			throw new RecyclerException("user does not exist");
+		}else {
+			return UserDetailsImpl.build(currentUser);	
 		}
 	}
 }

@@ -1,25 +1,30 @@
 package com.recycler.entity;
 
-import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 import org.hibernate.annotations.DynamicUpdate;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
 
 @Entity
 @Table(name="user")
 @JsonIgnoreProperties(allowSetters = true, value = {"password","status"})
 @DynamicUpdate
-public class User implements UserDetails {
+public class User {
 
   @Id
   private String id;
@@ -33,8 +38,17 @@ public class User implements UserDetails {
   private String email;
   
   @NotBlank(message = "password cannot be null")
-  @Size(min=6, max=18,message = "password length should between 6~18")
+//  @Size(min=6, max=18,message = "password length should between 6~18")
   private String password;
+  
+  @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+  @JoinTable(name = "user_role", 
+  			joinColumns = @JoinColumn(name = "user_id",referencedColumnName = "id"), 
+			inverseJoinColumns = @JoinColumn(name = "role_id",referencedColumnName = "id"))
+  private Set<Role> roles;
+  
+  @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,mappedBy = "user")
+  private List<Record> records;
   
   private int status;
   
@@ -81,44 +95,27 @@ public class User implements UserDetails {
   public void setStatus(int status) {
 	this.status = status;
   }
+  
+  public Set<Role> getRoles() {
+	return roles;
+  }
 
-  @Override
+  public void setRoles(Set<Role> roles) {
+	this.roles = roles;
+  }
+
+  public List<Record> getRecords() {
+	return records;
+}
+
+public void setRecords(List<Record> records) {
+	this.records = records;
+}
+
+
+@Override
   public String toString() {
 	return "User [id=" + id + ", name=" + username + ", email=" + email + ", password=" + password + ", status=" + status
 			+ "]";
   }
-
-
-@Override
-public Collection<? extends GrantedAuthority> getAuthorities() {
-	// TODO Auto-generated method stub
-	return null;
-}
-
-
-@Override
-public boolean isAccountNonExpired() {
-	// TODO Auto-generated method stub
-	return false;
-}
-
-
-@Override
-public boolean isAccountNonLocked() {
-	// TODO Auto-generated method stub
-	return false;
-}
-
-
-@Override
-public boolean isCredentialsNonExpired() {
-	// TODO Auto-generated method stub
-	return false;
-}
-
-
-	@Override
-	public boolean isEnabled() {
-	return status == 1;
-	}
 }
