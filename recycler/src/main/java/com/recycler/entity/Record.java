@@ -3,6 +3,9 @@ package com.recycler.entity;
 import java.sql.Timestamp;
 import java.util.List;
 
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.CascadeType;
@@ -14,11 +17,12 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name="record")
+@DynamicUpdate
+@DynamicInsert
 public class Record {
 	@Id
 	private String recordId;
@@ -31,14 +35,12 @@ public class Record {
 	@Size(min = 2,max = 45)
 	private String description;
 	
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.REFRESH,fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id",referencedColumnName = "id")
 	@JsonBackReference
-	@NotEmpty
 	private User user;
 	
-	@OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,mappedBy = "record")
-	@NotEmpty
+	@OneToMany(mappedBy = "record")
 	private List<RecordDetail> recordDetails;
 	
 	public Record () {

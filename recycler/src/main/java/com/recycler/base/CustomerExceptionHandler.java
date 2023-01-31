@@ -28,9 +28,9 @@ public class CustomerExceptionHandler {
         	System.out.println("--- find RecyclerException ---");
             return Result.error(((RecyclerException) e).getErrorCode(),e.getMessage());
     	}
-    	System.out.println("---Execption---");
+    	System.out.println("---Execption start---");
     	System.out.println(e);
-    	System.out.println("---------------");
+    	System.out.println("---Execption end---");
         return Result.error(ResultCode.SERVICE_UNAVAILABLE.getCode(),ResultCode.SERVICE_UNAVAILABLE.getMessage());
     }
     

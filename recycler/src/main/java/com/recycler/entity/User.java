@@ -47,7 +47,7 @@ public class User {
 			inverseJoinColumns = @JoinColumn(name = "role_id",referencedColumnName = "id"))
   private Set<Role> roles;
   
-  @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY,mappedBy = "user")
+  @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
   private List<Record> records;
   
   private int status;
@@ -63,7 +63,6 @@ public class User {
     this.id = id;
   }
   
-
   public String getUsername() {
 	return username;
   }

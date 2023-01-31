@@ -9,9 +9,9 @@ public interface RecordService {
 	
 	public Record addRecord(Record record,String userId,List<RecordDetail> recordDetails);
 	
-	public Record updateRecord(Record record,String userId,List<RecordDetail> recordDetails);
+	public Record updateRecord(Record record,List<RecordDetail> recordDetails);
 	
-	public Record deleteRecord(Record record);
+	public Record deleteRecord(String recordId);
 	
 	public List<Record> getAllRecords(String userId);
 }

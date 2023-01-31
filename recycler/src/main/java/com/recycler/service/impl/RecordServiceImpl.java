@@ -14,6 +14,8 @@ import com.recycler.entity.RecordDetail;
 import com.recycler.entity.User;
 import com.recycler.service.RecordService;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class RecordServiceImpl implements RecordService {
 	
@@ -36,6 +38,7 @@ public class RecordServiceImpl implements RecordService {
 		// bind details
 		for(RecordDetail recordDetail : recordDetails) {
 			recordDetail.setRecord(record);
+			recordDetail.setStatus(1);
 		}
 		// bind user
 		record.setUser(user);
@@ -46,14 +49,47 @@ public class RecordServiceImpl implements RecordService {
 	}
 
 	@Override
-	public Record updateRecord(Record record,String userId,List<RecordDetail> recordDetails) {
-		// TODO Auto-generated method stub
+	public Record updateRecord(Record record,List<RecordDetail> recordDetails) {
+		// find record from db
+		Record recordHistory = recordRepository.findById(record.getRecordId()).get();
+		if(recordHistory == null || recordHistory.getStatus() ==0) {
+			throw new RecyclerException("record does not exist");
+		}
+		// delete previous details
+		List<RecordDetail> oldDetails = recordHistory.getRecordDetails();
+		oldDetails.forEach(detail->{
+			detail.setStatus(0);
+		});
+		// bind new details
+		for(RecordDetail recordDetail : recordDetails) {
+			recordDetail.setRecord(record);
+			recordDetail.setStatus(1);
+		}
+		// update recordDetails
+		oldDetails.addAll(recordDetails);
+		record.setRecordDetails(oldDetails);
+		recordRepository.save(record);
 		return null;
 	}
 
 	@Override
-	public Record deleteRecord(Record record) {
-		// TODO Auto-generated method stub
+	@Transactional
+	public Record deleteRecord(String recordId) {
+		// find record from db
+		Record recordHistory = recordRepository.findById(recordId).get();
+		if(recordHistory == null || recordHistory.getStatus() ==0) {
+			throw new RecyclerException("record does not exist");
+		}
+		// delete details
+		List<RecordDetail> recordDetails = recordHistory.getRecordDetails();
+		recordDetails.forEach(detail->{
+			detail.setStatus(0);
+			detail.setRecord(recordHistory);
+		});
+		recordHistory.setRecordDetails(recordDetails);
+		// delete record
+		recordHistory.setStatus(0);
+		recordRepository.save(recordHistory);
 		return null;
 	}
 

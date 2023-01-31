@@ -2,9 +2,14 @@ package com.recycler.entity;
 
 import java.sql.Timestamp;
 
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -18,6 +23,8 @@ import jakarta.validation.constraints.NotEmpty;
 
 @Entity
 @Table(name = "record_details")
+@DynamicUpdate
+@DynamicInsert
 public class RecordDetail {
 	
 	@Id
@@ -33,10 +40,11 @@ public class RecordDetail {
 	
 	private Timestamp createTime;
 	
-	@ManyToOne
+	private int status;
+	
+	@ManyToOne(cascade = CascadeType.REFRESH,fetch = FetchType.LAZY)
 	@JoinColumn(name = "record_id",referencedColumnName = "recordId")
 	@JsonBackReference
-	@NotEmpty
 	private Record record;
 	
 	public RecordDetail() {
@@ -75,11 +83,12 @@ public class RecordDetail {
 		this.createTime = createTime;
 	}
 
-	public RecordDetail(String detailName, int detailQty, Record record) {
+	public RecordDetail(String detailName, int detailQty, Record record,int status) {
 		super();
 		this.detailName = detailName;
 		this.detailQty = detailQty;
 		this.record = record;
+		this.status = status;
 	}
 
 	public Record getRecord() {
@@ -90,10 +99,18 @@ public class RecordDetail {
 		this.record = record;
 	}
 
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
+
 	@Override
 	public String toString() {
-		return "RecordDetail [detailId=" + detailId + ", detailName=" + detailName
-				+ ", detailQty=" + detailQty + ", createTime=" + createTime + "]";
+		return "RecordDetail [detailId=" + detailId + ", detailName=" + detailName + ", detailQty=" + detailQty
+				+ ", createTime=" + createTime + ", status=" + status + "]";
 	}
 	
 }

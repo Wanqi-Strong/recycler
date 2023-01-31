@@ -46,7 +46,6 @@ public class UserServiceImpl implements UserService,UserDetailsService {
 		}
 	}
 
-	@Transactional
 	@Override
 	public User addUser(User user) {
 		// check if email already used
@@ -76,8 +75,8 @@ public class UserServiceImpl implements UserService,UserDetailsService {
 		return userRepository.findAll();
 	}
 
-	@Transactional
 	@Override
+	@Transactional
 	public User deleteUser(User user) {
 		User  currentUser= userRepository.findByEmail(user.getEmail());
 		if(currentUser == null) {
