@@ -1,5 +1,7 @@
 package com.recycler.controller;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,8 +31,9 @@ public class RecordController {
 	}
 	
 	// form-data
-	@PostMapping("/all")
-	public Result getAllRecord(@RequestParam(name="userId") String userId) {
+	@PostMapping("/allById")
+	public Result getAllRecord(@RequestBody Map<String,String> params) {
+		String userId = params.get("userId");
 		return  Result.success(recordService.getAllRecords(userId));
 	}
 	
@@ -42,7 +45,7 @@ public class RecordController {
 	
 	// form-data
 	@PostMapping("/delete")
-	public Result deleteRecord(@RequestParam(name="recordId") String recordId) {
+	public Result deleteRecord(@RequestBody String recordId) {
 		System.out.println(recordId);
 		return Result.success(recordService.deleteRecord(recordId));
 	}
